@@ -62,12 +62,14 @@ export default function Home() {
       {/* Topo / Header estilizado */}
       <header className="pt-6 pb-4 text-center flex flex-col items-center w-full max-w-sm">
         <div className="relative w-28 h-28 mb-3 bg-white p-3 rounded-full shadow-md shadow-pink-200/60 border border-pink-100 flex items-center justify-center">
-          <Image
-            src={logoImg}
-            alt="Logo Escudo Rosa"
-            className="object-contain w-full h-full"
-            priority
-          />
+        <Image
+  src="/logo.png"
+  alt="Logo Escudo Rosa"
+  width={112}
+  height={112}
+  className="object-contain w-full h-full"
+  priority
+/>
         </div>
         <p className="text-pink-700 text-xs font-bold uppercase tracking-widest">
           Canal Seguro de Apoio e Proteção
