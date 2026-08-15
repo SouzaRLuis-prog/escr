@@ -1,9 +1,10 @@
 {
 "name": "escudo-rosa",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint"
   },
