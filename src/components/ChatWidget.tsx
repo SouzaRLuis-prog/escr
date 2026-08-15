@@ -32,25 +32,30 @@ export default function ChatWidget({ victimData }: { victimData: VictimData }) {
       return mapa[tipo] || tipo;
     };
 
-    const BASE_URL = process.env.NEXT_PUBLIC_CHATWOOT_URL || 
-                     (typeof window !== 'undefined' ? window.location.origin : '');
+    const BASE_URL = process.env.NEXT_PUBLIC_CHATWOOT_URL || '';
 
-    (function (d, t) {
-      var g = d.createElement(t) as HTMLScriptElement;
-      var s = d.getElementsByTagName(t)[0];
-      
-      g.src = `${BASE_URL}/packs/js/sdk.js`;
-      g.defer = true;
-      g.async = true;
-      s.parentNode?.insertBefore(g, s);
+    if (!BASE_URL) return;
 
-      g.onload = function () {
+    // Remove script antigo se existir
+    const existingScript = document.getElementById('chatwoot-sdk');
+    if (existingScript) {
+      existingScript.remove();
+    }
+
+    const script = document.createElement('script');
+    script.id = 'chatwoot-sdk';
+    script.src = `${BASE_URL}/packs/js/sdk.js`;
+    script.defer = true;
+    script.async = true;
+
+    script.onload = () => {
+      if (window.chatwootSDK) {
         window.chatwootSDK.run({
           websiteToken: process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || '',
           baseUrl: BASE_URL,
         });
 
-        window.addEventListener('chatwoot:ready', () => {
+        const setupUser = () => {
           if (window.$chatwoot) {
             const tipoDesc = formatAgressao(victimData.tipoAgressao);
             const bairroDesc = victimData.bairro || 'Não informado';
@@ -65,9 +70,16 @@ export default function ChatWidget({ victimData }: { victimData: VictimData }) {
 
             window.$chatwoot.toggle('open');
           }
-        });
-      };
-    })(document, "script");
+        };
+
+        window.addEventListener('chatwoot:ready', setupUser);
+        
+        // Fallback caso o evento chatwoot:ready já tenha disparado
+        setTimeout(setupUser, 2000);
+      }
+    };
+
+    document.body.appendChild(script);
   }, [victimData]);
 
   return (
