@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import QuickExitBtn from '@/components/QuickExitBtn';
 import ChatWidget from '@/components/ChatWidget';
-import { VictimData } from '@/types/victim';
+import { VictimData, TipoAgressao } from '@/types/victim';
 
 export default function Home() {
   const [step, setStep] = useState<'welcome' | 'form' | 'loading' | 'chat'>('welcome');
@@ -17,7 +17,6 @@ export default function Home() {
     locationUrl: '',
   });
 
-  // Função para obter localização GPS / Google Maps
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       alert('Geolocalização não é suportada pelo seu navegador.');
@@ -39,7 +38,7 @@ export default function Home() {
         setGettingLocation(false);
         setLocationCaptured(true);
       },
-      (error) => {
+      () => {
         setGettingLocation(false);
         alert('Não foi possível obter a localização exata. Por favor, digite o bairro manualmente.');
       },
@@ -106,7 +105,6 @@ export default function Home() {
             />
           </div>
 
-          {/* Botão de Localização Google Maps */}
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">Localização Exata (Opcional / Seguro)</label>
             <button
@@ -133,20 +131,20 @@ export default function Home() {
           </div>
 
           <div>
-  <label className="block text-xs font-medium text-slate-400 mb-1">Tipo de Agressão / Situação</label>
-  <select
-    value={victimData.tipoAgressao}
-    onChange={(e) => setVictimData({ ...victimData, tipoAgressao: e.target.value as TipoAgressao })}
-    className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-pink-500"
-  >
-    <option value="fisica">1 - Agressão Física</option>
-    <option value="psicologica">2 - Violência Psicológica</option>
-    <option value="sexual">3 - Violência Sexual</option>
-    <option value="patrimonial">4 - Violência Patrimonial</option>
-    <option value="moral">5 - Violência Moral</option>
-    <option value="importunacao_sexual">6 - Importunação Sexual</option>
-  </select>
-</div>
+            <label className="block text-xs font-medium text-slate-400 mb-1">Tipo de Agressão / Situação</label>
+            <select
+              value={victimData.tipoAgressao}
+              onChange={(e) => setVictimData({ ...victimData, tipoAgressao: e.target.value as TipoAgressao })}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-pink-500"
+            >
+              <option value="fisica">1 - Agressão Física</option>
+              <option value="psicologica">2 - Violência Psicológica</option>
+              <option value="sexual">3 - Violência Sexual</option>
+              <option value="patrimonial">4 - Violência Patrimonial</option>
+              <option value="moral">5 - Violência Moral</option>
+              <option value="importunacao_sexual">6 - Importunação Sexual</option>
+            </select>
+          </div>
 
           <button
             type="submit"

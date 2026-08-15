@@ -30,12 +30,12 @@ services:
       - redis
     environment:
       - SECRET_KEY_BASE=escudorosa_secret_key_base_123456789_chatwoot
-      - FRONTEND_URL=http://localhost:3000
-      # --- WEBSOCKET E PERMISSÕES DE ORIGEM ---
-      - WEB_SOCKET_URL=ws://localhost:3000/cable
+      - FRONTEND_URL=https://${TUNNEL_URL}
+      - WEB_SOCKET_URL=wss://${TUNNEL_URL}/cable
+      - FORCE_SSL=false
       - ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION=true
+      - ACTION_CABLE_ALLOWED_REQUEST_ORIGINS=https://escudo-rosa-teste.netlify.app,https://${TUNNEL_URL}
       - ALLOW_EMBEDDED_IFRAMES=true
-      # ----------------------------------------
       - POSTGRES_DATABASE=chatwoot
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
@@ -58,9 +58,10 @@ services:
       - redis
     environment:
       - SECRET_KEY_BASE=escudorosa_secret_key_base_123456789_chatwoot
-      - FRONTEND_URL=http://localhost:3000
-      # --- WEBSOCKET E PERMISSÕES NO WORKER ---
-      - WEB_SOCKET_URL=ws://localhost:3000/cable
+      # --- URLS DINÂMICAS VIA ARQUIVO .ENV ---
+      - FRONTEND_URL=https://${TUNNEL_URL}
+      - WEB_SOCKET_URL=wss://${TUNNEL_URL}/cable
+      - FORCE_SSL=false
       - ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION=true
       - ALLOW_EMBEDDED_IFRAMES=true
       # ----------------------------------------

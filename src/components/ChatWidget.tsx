@@ -20,7 +20,6 @@ export default function ChatWidget({ victimData }: { victimData: VictimData }) {
       type: 'expanded_bubble',
     };
 
-    // Helper para converter a chave do tipo de agressão para texto amigável
     const formatAgressao = (tipo: string) => {
       const mapa: Record<string, string> = {
         fisica: '1 - Física',
@@ -33,25 +32,26 @@ export default function ChatWidget({ victimData }: { victimData: VictimData }) {
       return mapa[tipo] || tipo;
     };
 
+    const BASE_URL = process.env.NEXT_PUBLIC_CHATWOOT_URL || 
+                     (typeof window !== 'undefined' ? window.location.origin : '');
+
     (function (d, t) {
-      var BASE_URL = "http://localhost:3000";
       var g = d.createElement(t) as HTMLScriptElement;
       var s = d.getElementsByTagName(t)[0];
       
-      g.src = BASE_URL + "/packs/js/sdk.js";
+      g.src = `${BASE_URL}/packs/js/sdk.js`;
       g.defer = true;
       g.async = true;
       s.parentNode?.insertBefore(g, s);
 
       g.onload = function () {
         window.chatwootSDK.run({
-          websiteToken: 'shnBF1V8W4c6zavATq6VhAXr',
-          baseUrl: BASE_URL
+          websiteToken: process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || '',
+          baseUrl: BASE_URL,
         });
 
         window.addEventListener('chatwoot:ready', () => {
           if (window.$chatwoot) {
-            // Formata as informações para a descrição no painel do Chatwoot
             const tipoDesc = formatAgressao(victimData.tipoAgressao);
             const bairroDesc = victimData.bairro || 'Não informado';
             const locationDesc = victimData.locationUrl 
