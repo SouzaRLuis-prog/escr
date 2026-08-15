@@ -1,0 +1,37 @@
+# Dependências do Node
+/node_modules
+/.pnpm-store
+
+
+# Arquivos de Build do Next.js
+/.next/
+/out/
+/build
+/dist
+
+# VARIÁVEIS DE AMBIENTE E SEGREDO (NUNCA SUBIR)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Arquivos do Docker com dados sensíveis
+*.env.docker
+
+# Chaves e certificados
+*.pem
+*.key
+*.pub
+
+# Logs e arquivos do sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.suo
+*.user
+auth_info/
+auth_info*/
+*.json_sessions
