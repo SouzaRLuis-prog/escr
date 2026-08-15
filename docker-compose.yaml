@@ -28,12 +28,14 @@ services:
       - redis
     environment:
       - SECRET_KEY_BASE=escudorosa_secret_key_base_123456789_chatwoot
-      - FRONTEND_URL=${TUNNEL_URL}
-      - WEB_SOCKET_URL=wss://${TUNNEL_URL_HOST}/cable
+      - FRONTEND_URL=https://chat.ndsouza.online
+      - WEB_SOCKET_URL=wss://chat.ndsouza.online/cable
       - FORCE_SSL=false
       - ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION=true
-      - ACTION_CABLE_ALLOWED_REQUEST_ORIGINS=https://escudo-rosa-teste.netlify.app,${TUNNEL_URL}
+      - ACTION_CABLE_ALLOWED_REQUEST_ORIGINS=*
       - ALLOW_EMBEDDED_IFRAMES=true
+      - X_FRAME_OPTIONS=allowall
+      - CW_ALLOWED_DOMAINS=escudo-teste.vercel.app,ndsouza.online
       - POSTGRES_DATABASE=chatwoot
       - POSTGRES_HOST=postgres
       - POSTGRES_USERNAME=postgres
@@ -56,8 +58,8 @@ services:
       - redis
     environment:
       - SECRET_KEY_BASE=escudorosa_secret_key_base_123456789_chatwoot
-      - FRONTEND_URL=${TUNNEL_URL}
-      - WEB_SOCKET_URL=wss://${TUNNEL_URL_HOST}/cable
+      - FRONTEND_URL=https://chat.ndsouza.online
+      - WEB_SOCKET_URL=wss://chat.ndsouza.online/cable
       - FORCE_SSL=false
       - ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION=true
       - ALLOW_EMBEDDED_IFRAMES=true
@@ -82,13 +84,21 @@ services:
     volumes:
       - evolution_instances:/evolution/instances
     environment:
-      - SERVER_URL=${TUNNEL_URL}
+      - SERVER_URL=https://chat.ndsouza.online
       - AUTHENTICATION_API_KEY=escudorosa123
       - DATABASE_ENABLED=false
       - DATABASE_PROVIDER=local
       - CACHE_REDIS_ENABLED=false
       - CONFIG_SESSION_PHONE_CLIENT=Chrome
       - CONFIG_SESSION_PHONE_NAME=Chrome
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: escudo_rosa_cloudflared
+    restart: always
+    depends_on:
+      - chatwoot
+    command: tunnel --protocol http2 --no-autoupdate run --token eyJhIjoiYWU4MTc5M2FlOTczZTZmMzk5ZTZkY2UxYmQ4Yzc3OTciLCJ0IjoiMzdjOTcyNTMtNjA0NC00ODBlLTljZDUtOWQ0ODcwMGExNDI2IiwicyI6Ik9HVXlNekl3WVRRdFpUTXdOeTAwTXpnNExUbGpPRFF0TUdOak5tUmtaR000T1RWaiJ9
 
 volumes:
   postgres_data:

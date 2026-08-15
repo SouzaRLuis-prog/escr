@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 export default function QuickExitBtn() {
   const handleQuickExit = () => {
-    window.location.replace('https://www.g1.globo.com');
+    window.location.replace("www.google.com');
   };
 
   useEffect(() => {

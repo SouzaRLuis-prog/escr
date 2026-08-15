@@ -28,11 +28,13 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({ victimData }: ChatWidgetProps) {
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://sua-app.b4a.run';
-    const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'Jx18aWxNyFsCfQneK8HzDfiN';
+    // URLs e Tokens atualizados para o domínio oficial do Chatwoot
+    const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://chat.ndsouza.online';
+    const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'shnBF1V8W4c6zavATq6VhAXr';
 
-    // Injeta CSS para garantir exibição total no mobile
+    // Injeta CSS responsivo para mobile
     const style = document.createElement('style');
+    style.id = 'chatwoot-custom-style';
     style.innerHTML = `
       @media (max-width: 667px) {
         .woot-widget-holder {
@@ -51,43 +53,61 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
         }
       }
     `;
-    document.head.appendChild(style);
+    if (!document.getElementById('chatwoot-custom-style')) {
+      document.head.appendChild(style);
+    }
 
-    const script = document.createElement('script');
-    script.src = `${baseUrl}/packs/js/sdk.js`;
-    script.async = true;
-    script.defer = true;
+    // Função de callback quando o SDK do Chatwoot estiver pronto
+    const handleChatwootReady = () => {
+      const userId = `victim_${Date.now()}`;
+      const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
 
-    script.onload = () => {
-      window.chatwootSDK.run({
-        websiteToken,
-        baseUrl,
-      });
+      if (window.$chatwoot) {
+        window.$chatwoot.setUser(userId, {
+          name: name,
+          custom_attributes: {
+            cpf: victimData.cpf || 'Não informado',
+            bairro: victimData.bairro || 'Não informado',
+            tipo_agressao: victimData.tipoAgressao || 'Não informado',
+            localizacao_gps: victimData.locationUrl || 'Não fornecida',
+          },
+        });
 
-      window.addEventListener('chatwoot:ready', () => {
-        const userId = `victim_${Date.now()}`;
-        const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
-
-        if (window.$chatwoot) {
-          window.$chatwoot.setUser(userId, {
-            name: name,
-            custom_attributes: {
-              cpf: victimData.cpf || 'Não informado',
-              bairro: victimData.bairro || 'Não informado',
-              tipo_agressao: victimData.tipoAgressao || 'Não informado',
-              localizacao_gps: victimData.locationUrl || 'Não fornecida',
-            },
-          });
-
-          // Abre o chat imediatamente no mobile
-          setTimeout(() => {
-            window.$chatwoot.toggle('open');
-          }, 300);
-        }
-      });
+        // Abre o chat no mobile/desktop automaticamente
+        setTimeout(() => {
+          window.$chatwoot.toggle('open');
+        }, 300);
+      }
     };
 
-    document.head.appendChild(script);
+    window.addEventListener('chatwoot:ready', handleChatwootReady);
+
+    // Evita duplicar o script se ele já foi carregado no DOM
+    const existingScript = document.getElementById('chatwoot-sdk-script');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.id = 'chatwoot-sdk-script';
+      script.src = `${baseUrl}/packs/js/sdk.js`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        if (window.chatwootSDK) {
+          window.chatwootSDK.run({
+            websiteToken,
+            baseUrl,
+          });
+        }
+      };
+
+      document.head.appendChild(script);
+    } else if (window.$chatwoot) {
+      handleChatwootReady();
+    }
+
+    return () => {
+      window.removeEventListener('chatwoot:ready', handleChatwootReady);
+    };
   }, [victimData]);
 
   return (
@@ -111,8 +131,9 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
       </div>
 
       <button
+        type="button"
         onClick={() => window.$chatwoot && window.$chatwoot.toggle('open')}
-        className="w-full bg-pink-600 hover:bg-pink-500 text-black font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider"
+        className="w-full bg-pink-600 hover:bg-pink-500 text-black font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider cursor-pointer"
       >
         Abrir Janela de Mensagens
       </button>

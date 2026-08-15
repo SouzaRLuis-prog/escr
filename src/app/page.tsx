@@ -5,6 +5,7 @@ import Image from 'next/image';
 import QuickExitBtn from '@/components/QuickExitBtn';
 import ChatWidget from '@/components/ChatWidget';
 import { VictimData, TipoAgressao } from '@/types/victim';
+import logoImg from '@/img/logo.png'; // Importação direta da imagem em src/img/logo.png
 
 export default function Home() {
   const [step, setStep] = useState<'welcome' | 'form' | 'loading' | 'chat'>('welcome');
@@ -62,10 +63,9 @@ export default function Home() {
       <header className="pt-6 pb-4 text-center flex flex-col items-center w-full max-w-sm">
         <div className="relative w-24 h-24 mb-2 drop-shadow-[0_0_15px_rgba(255,20,147,0.4)]">
           <Image
-            src="/image-removebg-preview.png"
+            src={logoImg}
             alt="Logo Escudo Rosa"
-            fill
-            className="object-contain"
+            className="object-contain w-full h-full"
             priority
           />
         </div>
@@ -96,7 +96,7 @@ export default function Home() {
         {step === 'form' && (
           <form onSubmit={handleSubmitForm} className="bg-neutral-950 border border-pink-500/30 p-5 rounded-3xl shadow-[0_0_30px_rgba(255,20,147,0.15)] space-y-3.5">
             <div className="text-center pb-1">
-              <h2 className="text-xl font-black text-pink-500">Triagem Opicional</h2>
+              <h2 className="text-xl font-black text-pink-500">Triagem Opcional</h2>
               <p className="text-[11px] text-pink-300/70">Nenhum campo é obrigatório. Preencha apenas o que se sentir confortável.</p>
             </div>
             
