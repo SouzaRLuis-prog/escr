@@ -28,65 +28,73 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({ victimData }: ChatWidgetProps) {
   useEffect(() => {
-    // URLs e Tokens atualizados para o domínio oficial do Chatwoot
     const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://chat.ndsouza.online';
     const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'shnBF1V8W4c6zavATq6VhAXr';
 
-    // Injeta CSS responsivo para mobile
-    const style = document.createElement('style');
-    style.id = 'chatwoot-custom-style';
-    style.innerHTML = `
-      @media (max-width: 667px) {
-        .woot-widget-holder {
-          top: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          max-height: 100vh !important;
-          border-radius: 0 !important;
+    // Injeta CSS para ajustar o modal em mobile
+    const styleId = 'chatwoot-custom-style';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        @media (max-width: 667px) {
+          .woot-widget-holder {
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+          }
+          .woot--bubble-holder {
+            bottom: 20px !important;
+            right: 20px !important;
+          }
         }
-        .woot--bubble-holder {
-          bottom: 20px !important;
-          right: 20px !important;
-        }
-      }
-    `;
-    if (!document.getElementById('chatwoot-custom-style')) {
+      `;
       document.head.appendChild(style);
     }
 
-    // Função de callback quando o SDK do Chatwoot estiver pronto
+    // Função de preenchimento de dados
     const handleChatwootReady = () => {
+      if (!window.$chatwoot) return;
+
       const userId = `victim_${Date.now()}`;
       const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
 
-      if (window.$chatwoot) {
-        window.$chatwoot.setUser(userId, {
-          name: name,
-          custom_attributes: {
-            cpf: victimData.cpf || 'Não informado',
-            bairro: victimData.bairro || 'Não informado',
-            tipo_agressao: victimData.tipoAgressao || 'Não informado',
-            localizacao_gps: victimData.locationUrl || 'Não fornecida',
-          },
-        });
+      const attributesPayload = {
+        cpf: victimData.cpf || 'Não informado',
+        bairro: victimData.bairro || 'Não informado',
+        tipo_agressao: victimData.tipoAgressao || 'Não informado',
+        localizacao_gps: victimData.locationUrl || 'Não fornecida',
+      };
 
-        // Abre o chat no mobile/desktop automaticamente
-        setTimeout(() => {
-          window.$chatwoot.toggle('open');
-        }, 300);
-      }
+      // 1. Identifica o usuário e envia os custom attributes
+      window.$chatwoot.setUser(userId, {
+        name: name,
+        custom_attributes: attributesPayload,
+      });
+
+      // 2. Reforça o envio dos atributos na sessão atual do widget
+      window.$chatwoot.setCustomAttributes(attributesPayload);
+
+      // 3. Abre a janela de atendimento
+      setTimeout(() => {
+        window.$chatwoot.toggle('open');
+      }, 400);
     };
 
     window.addEventListener('chatwoot:ready', handleChatwootReady);
 
-    // Evita duplicar o script se ele já foi carregado no DOM
-    const existingScript = document.getElementById('chatwoot-sdk-script');
+    // Injeção dinâmica da SDK
+    const scriptId = 'chatwoot-sdk-script';
+    const existingScript = document.getElementById(scriptId);
+
     if (!existingScript) {
       const script = document.createElement('script');
-      script.id = 'chatwoot-sdk-script';
+      script.id = scriptId;
       script.src = `${baseUrl}/packs/js/sdk.js`;
       script.async = true;
       script.defer = true;
