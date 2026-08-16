@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 export default function QuickExitBtn() {
   const handleQuickExit = () => {
-    window.location.replace("www.google.com');
+    window.location.replace('https://www.google.com');
   };
 
   useEffect(() => {
@@ -21,10 +21,11 @@ export default function QuickExitBtn() {
   return (
     <button
       onClick={handleQuickExit}
-      className="fixed top-4 right-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-lg z-50 text-sm flex items-center gap-2 transition-all cursor-pointer"
+      className="fixed top-3 right-3 sm:top-4 sm:right-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 sm:px-4 rounded-full shadow-lg z-50 text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer focus:outline-none focus:ring-4 focus:ring-red-300"
       title="Pressione ESC para sair rapidamente"
     >
-      🚨 SAÍDA RÁPIDA (ESC)
+      🚨 <span className="hidden sm:inline">SAÍDA RÁPIDA (ESC)</span>
+      <span className="sm:hidden">SAIR</span>
     </button>
   );
 }

@@ -91,28 +91,37 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
   }, [victimData]);
 
   return (
-    <div className="bg-neutral-950 border border-pink-500/30 p-6 rounded-3xl text-center shadow-[0_0_30px_rgba(255,20,147,0.15)] space-y-4">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-pink-500/10 text-pink-500 border border-pink-500/30">
+    <div className="bg-[var(--surface-card)] border border-[var(--border)] p-6 rounded-3xl text-center shadow-xl shadow-[var(--primary-soft)]/15 space-y-4">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--surface-tint)] text-[var(--primary)] border border-[var(--border)]">
         <span className="text-2xl">🛡️</span>
       </div>
-      
+
       <div>
-        <h2 className="text-xl font-bold text-white">Canal Aberto</h2>
-        <p className="text-xs text-neutral-400 mt-1">Conexão segura e sigilosa estabelecida.</p>
+        <h2 className="text-xl font-bold text-[var(--ink)]">Canal Aberto</h2>
+        <p className="text-xs text-[var(--ink-muted)] mt-1">
+          Conexão segura e sigilosa estabelecida.
+        </p>
       </div>
 
-      <div className="bg-neutral-900/80 p-3.5 rounded-2xl text-left text-xs space-y-1.5 border border-neutral-800">
-        <p><strong className="text-pink-400">Nome:</strong> {victimData.nome || 'Anônima'}</p>
-        <p><strong className="text-pink-400">CPF:</strong> {victimData.cpf || 'Não informado'}</p>
-        <p><strong className="text-pink-400">Região:</strong> {victimData.bairro || 'Não informada'}</p>
+      <div className="bg-[var(--surface-tint)] p-3.5 rounded-2xl text-left text-xs space-y-1.5 border border-[var(--border)]">
+        <p>
+          <strong className="text-[var(--primary)]">Nome:</strong> {victimData.nome || 'Anônima'}
+        </p>
+        <p>
+          <strong className="text-[var(--primary)]">CPF:</strong> {victimData.cpf || 'Não informado'}
+        </p>
+        <p>
+          <strong className="text-[var(--primary)]">Região:</strong>{' '}
+          {victimData.bairro || 'Não informada'}
+        </p>
         {victimData.locationUrl && (
-          <p className="text-emerald-400 font-semibold">📍 GPS Enviado para a equipe</p>
+          <p className="text-[var(--success)] font-semibold">📍 GPS Enviado para a equipe</p>
         )}
       </div>
 
       <button
         onClick={() => window.$chatwoot && window.$chatwoot.toggle('open')}
-        className="w-full bg-pink-600 hover:bg-pink-500 text-black font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider"
+        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider focus:outline-none focus:ring-4 focus:ring-[var(--ring)]/30"
       >
         Abrir Janela de Mensagens
       </button>
