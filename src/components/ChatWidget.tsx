@@ -28,66 +28,83 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({ victimData }: ChatWidgetProps) {
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://sua-app.b4a.run';
-    const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'Jx18aWxNyFsCfQneK8HzDfiN';
+    // 1. URLs e Tokens apontando diretamente para o seu domínio oficial
+    const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://chat.ndsouza.online';
+    const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'shnBF1V8W4c6zavATq6VhAXr';
 
-    // Injeta CSS para garantir exibição total no mobile
-    const style = document.createElement('style');
-    style.innerHTML = `
-      @media (max-width: 667px) {
-        .woot-widget-holder {
-          top: 0 !important;
-          right: 0 !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          width: 100% !important;
-          height: 100% !important;
-          max-height: 100vh !important;
-          border-radius: 0 !important;
+    // 2. Injeta CSS para garantir exibição total no mobile
+    const styleId = 'chatwoot-mobile-style';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.innerHTML = `
+        @media (max-width: 667px) {
+          .woot-widget-holder {
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+          }
+          .woot--bubble-holder {
+            bottom: 20px !important;
+            right: 20px !important;
+          }
         }
-        .woot--bubble-holder {
-          bottom: 20px !important;
-          right: 20px !important;
-        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // 3. Evita duplicar a injeção do SDK se ele já existir no DOM
+    const scriptId = 'chatwoot-sdk-script';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
+
+    const setupChatwootUser = () => {
+      const userId = `victim_${Date.now()}`;
+      const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
+
+      if (window.$chatwoot) {
+        window.$chatwoot.setUser(userId, {
+          name: name,
+          custom_attributes: {
+            cpf: victimData.cpf || 'Não informado',
+            bairro: victimData.bairro || 'Não informado',
+            tipo_agressao: victimData.tipoAgressao || 'Não informado',
+            localizacao_gps: victimData.locationUrl || 'Não fornecida',
+          },
+        });
+
+        setTimeout(() => {
+          window.$chatwoot.toggle('open');
+        }, 300);
       }
-    `;
-    document.head.appendChild(style);
-
-    const script = document.createElement('script');
-    script.src = `${baseUrl}/packs/js/sdk.js`;
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      window.chatwootSDK.run({
-        websiteToken,
-        baseUrl,
-      });
-
-      window.addEventListener('chatwoot:ready', () => {
-        const userId = `victim_${Date.now()}`;
-        const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
-
-        if (window.$chatwoot) {
-          window.$chatwoot.setUser(userId, {
-            name: name,
-            custom_attributes: {
-              cpf: victimData.cpf || 'Não informado',
-              bairro: victimData.bairro || 'Não informado',
-              tipo_agressao: victimData.tipoAgressao || 'Não informado',
-              localizacao_gps: victimData.locationUrl || 'Não fornecida',
-            },
-          });
-
-          // Abre o chat imediatamente no mobile
-          setTimeout(() => {
-            window.$chatwoot.toggle('open');
-          }, 300);
-        }
-      });
     };
 
-    document.head.appendChild(script);
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = `${baseUrl}/packs/js/sdk.js`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        if (window.chatwootSDK) {
+          window.chatwootSDK.run({
+            websiteToken,
+            baseUrl,
+          });
+
+          window.addEventListener('chatwoot:ready', setupChatwootUser);
+        }
+      };
+
+      document.head.appendChild(script);
+    } else if (window.$chatwoot) {
+      setupChatwootUser();
+    }
   }, [victimData]);
 
   return (

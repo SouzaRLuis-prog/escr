@@ -102,7 +102,7 @@ services:
     restart: always
     depends_on:
       - chatwoot
-    command: tunnel --protocol http2 --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token eyJhIjoiYWU4MTc5M2FlOTczZTZmMzk5ZTZkY2UxYmQ4Yzc3OTciLCJ0IjoiMzdjOTcyNTMtNjA0NC00ODBlLTljZDUtOWQ0ODcwMGExNDI2IiwicyI6Ik9HVXlNekl3WVRRdFpUTXdOeTAwTXpnNExUbGpPRFF0TUdOak5tUmtaR000T1RWaiJ9
 
 volumes:
   postgres_data:
