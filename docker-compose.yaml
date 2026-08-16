@@ -23,6 +23,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - chatwoot_storage:/app/storage
     depends_on:
       - postgres
       - redis
@@ -53,6 +55,8 @@ services:
     image: chatwoot/chatwoot:v3.14.0
     container_name: escudo_rosa_chatwoot_worker
     restart: always
+    volumes:
+      - chatwoot_storage:/app/storage
     depends_on:
       - postgres
       - redis
@@ -98,9 +102,10 @@ services:
     restart: always
     depends_on:
       - chatwoot
-    command: tunnel --protocol http2 --no-autoupdate run --token eyJhIjoiYWU4MTc5M2FlOTczZTZmMzk5ZTZkY2UxYmQ4Yzc3OTciLCJ0IjoiMzdjOTcyNTMtNjA0NC00ODBlLTljZDUtOWQ0ODcwMGExNDI2IiwicyI6Ik9HVXlNekl3WVRRdFpUTXdOeTAwTXpnNExUbGpPRFF0TUdOak5tUmtaR000T1RWaiJ9
+    command: tunnel --protocol http2 --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
 
 volumes:
   postgres_data:
   redis_data:
   evolution_instances:
+  chatwoot_storage:
