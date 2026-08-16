@@ -28,11 +28,11 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({ victimData }: ChatWidgetProps) {
   useEffect(() => {
-    // 1. URLs e Tokens apontando diretamente para o seu domínio oficial
+    // 1. Obtém a URL e o Token configurados
     const baseUrl = process.env.NEXT_PUBLIC_CHATWOOT_URL || 'https://chat.ndsouza.online';
     const websiteToken = process.env.NEXT_PUBLIC_CHATWOOT_WEBSITE_TOKEN || 'shnBF1V8W4c6zavATq6VhAXr';
 
-    // 2. Injeta CSS para garantir exibição total no mobile
+    // 2. Estilo CSS para cobrir telas móbile totalmente
     const styleId = 'chatwoot-mobile-style';
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
@@ -58,30 +58,41 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
       document.head.appendChild(style);
     }
 
-    // 3. Evita duplicar a injeção do SDK se ele já existir no DOM
-    const scriptId = 'chatwoot-sdk-script';
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    // 3. Função para sincronizar os dados da vítima com a sessão do Chatwoot
+    const handleSetupUser = () => {
+      if (window.$chatwoot && typeof window.$chatwoot.setUser === 'function') {
+        const userId = `victim_${Date.now()}`;
+        const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
 
-    const setupChatwootUser = () => {
-      const userId = `victim_${Date.now()}`;
-      const name = victimData.nome?.trim() ? victimData.nome : 'Anônima';
+        try {
+          window.$chatwoot.setUser(userId, {
+            name: name,
+            custom_attributes: {
+              cpf: victimData.cpf || 'Não informado',
+              bairro: victimData.bairro || 'Não informado',
+              tipo_agressao: victimData.tipoAgressao || 'Não informado',
+              localizacao_gps: victimData.locationUrl || 'Não fornecida',
+            },
+          });
+        } catch (err) {
+          console.warn('Chatwoot setUser aguardando inicialização completa...', err);
+        }
 
-      if (window.$chatwoot) {
-        window.$chatwoot.setUser(userId, {
-          name: name,
-          custom_attributes: {
-            cpf: victimData.cpf || 'Não informado',
-            bairro: victimData.bairro || 'Não informado',
-            tipo_agressao: victimData.tipoAgressao || 'Não informado',
-            localizacao_gps: victimData.locationUrl || 'Não fornecida',
-          },
-        });
-
+        // Abre a janela do chat após o registro
         setTimeout(() => {
-          window.$chatwoot.toggle('open');
-        }, 300);
+          if (window.$chatwoot) {
+            window.$chatwoot.toggle('open');
+          }
+        }, 500);
       }
     };
+
+    // Escuta o evento oficial informado no SDK (be="chatwoot:ready")
+    window.addEventListener('chatwoot:ready', handleSetupUser);
+
+    // 4. Injeção segura do SDK sem duplicações
+    const scriptId = 'chatwoot-sdk-script';
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
 
     if (!script) {
       script = document.createElement('script');
@@ -96,15 +107,17 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
             websiteToken,
             baseUrl,
           });
-
-          window.addEventListener('chatwoot:ready', setupChatwootUser);
         }
       };
 
       document.head.appendChild(script);
-    } else if (window.$chatwoot) {
-      setupChatwootUser();
+    } else if (window.$chatwoot?.hasLoaded) {
+      handleSetupUser();
     }
+
+    return () => {
+      window.removeEventListener('chatwoot:ready', handleSetupUser);
+    };
   }, [victimData]);
 
   return (
@@ -138,7 +151,7 @@ export default function ChatWidget({ victimData }: ChatWidgetProps) {
 
       <button
         onClick={() => window.$chatwoot && window.$chatwoot.toggle('open')}
-        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider focus:outline-none focus:ring-4 focus:ring-[var(--ring)]/30"
+        className="w-full bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-extrabold py-3 rounded-2xl transition-all uppercase text-xs tracking-wider focus:outline-none focus:ring-4 focus:ring-[var(--ring)]/30 cursor-pointer"
       >
         Abrir Janela de Mensagens
       </button>
